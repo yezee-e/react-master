@@ -1,24 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 
-const Wrapper = styled.div`
-  display: flex;
-  height: 100vh;
-  width: 100vw;
-  justify-content: center;
-  align-items: center;
-  background-color: ${(props) => props.theme.backgroundColor};
+const Container = styled.div`
+  background-color: ${(props) => props.theme.bgColor};
 `;
-
-const Title = styled.h1`
+const H1 = styled.h1`
   color: ${(props) => props.theme.textColor};
 `;
-
 function App() {
+  const [value, setValue] = useState('');
+
   return (
-    <Wrapper>
-      <Title>Hello</Title>
-    </Wrapper>
+    <Container>
+      <H1>Hello</H1>
+    </Container>
   );
 }
 
