@@ -1,17 +1,16 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   Link,
   Outlet,
   useLocation,
   useMatch,
-  useOutletContext,
   useParams,
 } from 'react-router-dom';
 import styled from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
 import { fetchCoinInfo, fetchCoinTickers } from './api';
 import { Helmet } from 'react-helmet';
+import Darkmode from '../components/Darkmode';
 
 const Container = styled.div`
   padding: 0px 20px;
@@ -22,8 +21,11 @@ const Container = styled.div`
 const Header = styled.header`
   height: 10vh;
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
+  a {
+    font-size: 30px;
+  }
 `;
 
 const Title = styled.h1`
@@ -108,7 +110,7 @@ interface IInfoData {
   last_data_at: string;
 }
 
-interface IPriceData {
+export interface IPriceData {
   beta_value: number;
   circulating_supply: number;
   first_data_at: string;
@@ -141,16 +143,12 @@ interface IPriceData {
   symbol: string;
   total_supply: number;
 }
-interface ToggleDarkType {
-  isDark: boolean;
-}
 
 function Coin() {
   const { coinId } = useParams();
   const { state } = useLocation() as RouterState;
   const priceMatch = useMatch(`:coinId/price`);
   const chartMatch = useMatch(`:coinId/chart`);
-  const { isDark } = useOutletContext<ToggleDarkType>();
 
   const { isLoading: infoLoading, data: infoData } = useQuery<IInfoData>(
     ['info', coinId],
@@ -174,11 +172,12 @@ function Coin() {
         </title>
       </Helmet>
       <Header>
+        <Link to='/'>🏠</Link>
         <Title>
-          <Link to='/'>
-            {state?.name ? state.name : loading ? 'Loading..' : infoData?.name}
-          </Link>
+          {state?.name ? state.name : loading ? 'Loading..' : infoData?.name}
         </Title>
+
+        <Darkmode />
       </Header>
       {loading ? (
         <Loader>Loading...</Loader>
@@ -218,7 +217,7 @@ function Coin() {
               <Link to='price'>Price</Link>
             </Tab>
           </Tabs>
-          <Outlet context={{ coinId, isDark }} />
+          <Outlet context={{ coinId }} />
         </>
       )}
     </Container>

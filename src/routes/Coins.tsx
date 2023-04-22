@@ -1,9 +1,10 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Link, useOutletContext } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { fetchCoins } from './api';
 import { Helmet } from 'react-helmet';
+import Darkmode from '../components/Darkmode';
 
 const Container = styled.div`
   padding: 0px 20px;
@@ -14,14 +15,17 @@ const Container = styled.div`
 const Header = styled.header`
   height: 10vh;
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
+  a {
+    font-size: 30px;
+  }
 `;
 
 const CoinList = styled.ul``;
 
 const Coin = styled.li`
-  background-color: white;
+  background-color: lightblue;
   color: ${(props) => props.theme.textColor};
   margin-bottom: 10px;
   border-radius: 15px;
@@ -64,22 +68,19 @@ interface ICoin {
   type: string;
 }
 
-interface ICoinsProps {
-  toggleDark: () => void;
-}
-
 function Coins() {
   const { isLoading, data } = useQuery<ICoin[]>(['allCoins'], fetchCoins);
-  const { toggleDark } = useOutletContext<ICoinsProps>();
 
   return (
     <Container>
       <Helmet>
-        <title>코인</title>
+        <title>Coins</title>
       </Helmet>
       <Header>
-        <Title>코인</Title>
-        <button onClick={toggleDark}>다크모드</button>
+        <Link to='/'>🏠</Link>
+        <Title>Coins</Title>
+
+        <Darkmode />
       </Header>
       {isLoading ? (
         <Loader>Loading...</Loader>
