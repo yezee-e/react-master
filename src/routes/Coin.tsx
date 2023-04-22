@@ -5,11 +5,13 @@ import {
   Outlet,
   useLocation,
   useMatch,
+  useOutletContext,
   useParams,
 } from 'react-router-dom';
 import styled from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
 import { fetchCoinInfo, fetchCoinTickers } from './api';
+import { Helmet } from 'react-helmet';
 
 const Container = styled.div`
   padding: 0px 20px;
@@ -139,12 +141,16 @@ interface IPriceData {
   symbol: string;
   total_supply: number;
 }
+interface ToggleDarkType {
+  isDark: boolean;
+}
 
 function Coin() {
   const { coinId } = useParams();
   const { state } = useLocation() as RouterState;
   const priceMatch = useMatch(`:coinId/price`);
   const chartMatch = useMatch(`:coinId/chart`);
+  const { isDark } = useOutletContext<ToggleDarkType>();
 
   const { isLoading: infoLoading, data: infoData } = useQuery<IInfoData>(
     ['info', coinId],
@@ -152,16 +158,26 @@ function Coin() {
   );
   const { isLoading: tickersLoading, data: tickersData } = useQuery<IPriceData>(
     ['tickers', coinId],
-    () => fetchCoinTickers(coinId)
+    () => fetchCoinTickers(coinId),
+    {
+      refetchInterval: 5000,
+    }
   );
 
   const loading = infoLoading || tickersLoading;
 
   return (
     <Container>
+      <Helmet>
+        <title>
+          {state?.name ? state.name : loading ? 'Loading..' : infoData?.name}
+        </title>
+      </Helmet>
       <Header>
         <Title>
-          {state?.name ? state.name : loading ? 'Loading..' : infoData?.name}
+          <Link to='/'>
+            {state?.name ? state.name : loading ? 'Loading..' : infoData?.name}
+          </Link>
         </Title>
       </Header>
       {loading ? (
@@ -178,8 +194,8 @@ function Coin() {
               <span>{infoData?.symbol}</span>
             </OverviewItem>
             <OverviewItem>
-              <span>Open Source:</span>
-              <span>{infoData?.open_source ? 'YES' : 'NO'}</span>
+              <span>Price:</span>
+              <span>{Number(tickersData?.quotes.USD.price).toFixed(3)}</span>
             </OverviewItem>
           </Overview>
           <Description>{infoData?.description}</Description>
@@ -202,7 +218,7 @@ function Coin() {
               <Link to='price'>Price</Link>
             </Tab>
           </Tabs>
-          <Outlet />
+          <Outlet context={{ coinId, isDark }} />
         </>
       )}
     </Container>

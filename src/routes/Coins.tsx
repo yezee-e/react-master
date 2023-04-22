@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
 import styled from 'styled-components';
 import { fetchCoins } from './api';
+import { Helmet } from 'react-helmet';
 
 const Container = styled.div`
   padding: 0px 20px;
@@ -21,7 +22,7 @@ const CoinList = styled.ul``;
 
 const Coin = styled.li`
   background-color: white;
-  color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.textColor};
   margin-bottom: 10px;
   border-radius: 15px;
   padding: 20px;
@@ -63,13 +64,22 @@ interface ICoin {
   type: string;
 }
 
+interface ICoinsProps {
+  toggleDark: () => void;
+}
+
 function Coins() {
   const { isLoading, data } = useQuery<ICoin[]>(['allCoins'], fetchCoins);
+  const { toggleDark } = useOutletContext<ICoinsProps>();
 
   return (
     <Container>
+      <Helmet>
+        <title>코인</title>
+      </Helmet>
       <Header>
         <Title>코인</Title>
+        <button onClick={toggleDark}>다크모드</button>
       </Header>
       {isLoading ? (
         <Loader>Loading...</Loader>
